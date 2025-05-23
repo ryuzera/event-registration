@@ -1,6 +1,9 @@
 package br.com.nlw.events.service;
 
+import br.com.nlw.events.dto.SubscriptionResponse;
 import br.com.nlw.events.exception.EventNotFoundException;
+import br.com.nlw.events.exception.SubscriptionConflictException;
+import br.com.nlw.events.exception.UserIndicatorNotFoundException;
 import br.com.nlw.events.model.Event;
 import br.com.nlw.events.model.Subscription;
 import br.com.nlw.events.model.User;
@@ -21,7 +24,7 @@ public class SubscriptionService {
     @Autowired
     private SubscriptionRepository subscriptionRepository;
 
-    public Subscription createNewSubscription(String eventName, User user) {
+    public SubscriptionResponse createNewSubscription(String eventName, User user, Integer userId) {
         Event evt = eventRepository.findByPrettyName(eventName);
         if (evt == null) {
             throw new EventNotFoundException("Event: " + eventName + " not found");
@@ -31,13 +34,23 @@ public class SubscriptionService {
         if(userRec == null) {
             userRec = userRepository.save(user);
         }
-        user = userRepository.save(user);
+
+        User indicator = userRepository.findById(userId).orElse(null);
+        if (indicator == null) {
+            throw new UserIndicatorNotFoundException("User: " + userId + " not found");
+        }
 
         Subscription subs = new Subscription();
         subs.setEvent(evt);
         subs.setSubscriber(userRec);
+        subs.setIndication(indicator);
+
+        Subscription tmpSub = subscriptionRepository.findByEventAndSubscriber(evt, userRec);
+        if (tmpSub != null) {
+            throw new SubscriptionConflictException("Subscription already exists to user: " + userRec.getUserName() + " in event " + evt.getTitle()) ;
+        }
 
         Subscription res = subscriptionRepository.save(subs);
-        return res;
+        return new SubscriptionResponse(res.getSubscriptionNumber(), "http://codecraft.com/" + evt.getPrettyName() + "/" + res.getSubscriber().getId());
     }
 }
