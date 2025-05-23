@@ -33,4 +33,10 @@ public class EventController {
 
         return ResponseEntity.notFound().build();
     }
+
+    @DeleteMapping("/events/{prettyName}")
+    public ResponseEntity<Event> deleteEventByPrettyName(@PathVariable("prettyName") String prettyName) {
+        service.deleteByPrettyName(prettyName);
+        return ResponseEntity.ok().build();
+    }
 }

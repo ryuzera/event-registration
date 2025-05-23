@@ -26,4 +26,9 @@ public class EventService {
     public Event getByPrettyName(String prettyName) {
         return repository.findByPrettyName(prettyName);
     }
+
+    public void deleteByPrettyName(String prettyName) {
+        repository.findByPrettyName(prettyName);
+        repository.delete(getByPrettyName(prettyName));
+    }
 }
