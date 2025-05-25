@@ -1,7 +1,7 @@
 package br.com.nlw.events.controller;
 
-import br.com.nlw.events.dto.ErrorMessage;
-import br.com.nlw.events.dto.SubscriptionResponse;
+import br.com.nlw.events.dto.ErrorMessageDTO;
+import br.com.nlw.events.dto.SubscriptionResponseDTO;
 import br.com.nlw.events.exception.EventNotFoundException;
 import br.com.nlw.events.exception.SubscriptionConflictException;
 import br.com.nlw.events.exception.UserIndicatorNotFoundException;
@@ -25,18 +25,18 @@ public class SubscriptionController {
                                                 @RequestBody User subscriber,
                                                 @PathVariable(required = false) Integer userId) {
         try {
-            SubscriptionResponse res = subscriptionService.createNewSubscription(prettyName, subscriber, userId);
+            SubscriptionResponseDTO res = subscriptionService.createNewSubscription(prettyName, subscriber, userId);
 
             if(res != null) {
                 return ResponseEntity.ok(res);
             }
 
         } catch (EventNotFoundException e) {
-            return ResponseEntity.status(404).body(new ErrorMessage(e.getMessage()));
+            return ResponseEntity.status(404).body(new ErrorMessageDTO(e.getMessage()));
         } catch (SubscriptionConflictException e) {
-            return ResponseEntity.status(409).body(new ErrorMessage(e.getMessage()));
+            return ResponseEntity.status(409).body(new ErrorMessageDTO(e.getMessage()));
         } catch (UserIndicatorNotFoundException e) {
-            return ResponseEntity.status(404).body(new ErrorMessage(e.getMessage()));
+            return ResponseEntity.status(404).body(new ErrorMessageDTO(e.getMessage()));
         }
 
         return ResponseEntity.badRequest().build();

@@ -1,6 +1,6 @@
 package br.com.nlw.events.service;
 
-import br.com.nlw.events.dto.SubscriptionResponse;
+import br.com.nlw.events.dto.SubscriptionResponseDTO;
 import br.com.nlw.events.exception.EventNotFoundException;
 import br.com.nlw.events.exception.SubscriptionConflictException;
 import br.com.nlw.events.exception.UserIndicatorNotFoundException;
@@ -24,7 +24,7 @@ public class SubscriptionService {
     @Autowired
     private SubscriptionRepository subscriptionRepository;
 
-    public SubscriptionResponse createNewSubscription(String eventName, User user, Integer userId) {
+    public SubscriptionResponseDTO createNewSubscription(String eventName, User user, Integer userId) {
         Event evt = eventRepository.findByPrettyName(eventName);
         if (evt == null) {
             throw new EventNotFoundException("Event: " + eventName + " not found");
@@ -54,6 +54,6 @@ public class SubscriptionService {
         }
 
         Subscription res = subscriptionRepository.save(subs);
-        return new SubscriptionResponse(res.getSubscriptionNumber(), "http://codecraft.com/" + evt.getPrettyName() + "/" + res.getSubscriber().getId());
+        return new SubscriptionResponseDTO(res.getSubscriptionNumber(), "http://codecraft.com/" + evt.getPrettyName() + "/" + res.getSubscriber().getId());
     }
 }
